@@ -2,16 +2,18 @@
 
 Projeto desenvolvido por **Wellington Marciano**, para o sistema de instrumentação do primeiro protótipo, chamado carinhosamente de **BR-01** pela equipe **Baja dos Reis** (2021 - 2025), projeto de extensão Baja-SAE.
 
-**Propósito:** O intuito deste repositório é servir de suporte para pequenas equipes que estão em desenvolvimento, promovendo a troca de ideias sobre como criar um painel funcional de baixo custo.
+**Propósito:** O intuito deste repositório é servir de suporte para pequenas equipes que estão em desenvolvimento, promovendo a troca de ideias sobre como criar um painel funcional de baixo custo e facilitando a utilização do ESP32 com o simulador Wokwi no VS Code.
 
 O sistema consiste em um painel de instrumentos digital completo utilizando **ESP32** e display **TFT**. Ele monitora velocidade, rotação (RPM), temperatura do motor e nível de combustível em tempo real.
 
 ![Status do Projeto](https://img.shields.io/badge/Status-Funcional-green)
 ![Hardware](https://img.shields.io/badge/Hardware-ESP32-blue)
-![Bibliotecas](https://img.shields.io/badge/Bibliotecas-Inclusas-orange)
+![Simulador](https://img.shields.io/badge/Simulador-Wokwi-orange)
+![Instalação](https://img.shields.io/badge/Instalação-Plug_&_Play-brightgreen)
+
 
 <div align="center">
-  <img width="80%" src="https://github.com/user-attachments/assets/ca4ef5bf-b569-474c-8ad7-47992c2b9b98" />
+  <img width="80%" src="https://github.com/user-attachments/assets/978eb178-02ba-4564-bdb1-f44cea07a9ed" />
   <br>
   <sub>Interface Principal do Sistema</sub>
 </div>
@@ -25,7 +27,7 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
     * 🟢 **Cheio:** Ambos sensores ativos.
     * 🟡 **Médio:** Apenas um sensor ativo.
     * 🔴 **Crítico:** Ambos inativos (Alerta piscante na tela).
-* **Interface Gráfica (GUI):** Interface responsiva criada com **GUIslice**.
+* **Interface Gráfica (GUI):** Interface responsiva criada com **GUIslice** e barra de carregamento (loading screen) na inicialização.
 
 <div align="center">
   <img src="https://github.com/user-attachments/assets/8182d2cd-37f3-4b42-9b4b-951f2ce36a80" width="45%" alt="Tela de Boot" />
@@ -34,7 +36,21 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
   <sub>Esq: Tela de Inicialização | Dir: Design no GUIslice Builder</sub>
 </div>
 
+## 🎮 Simulação no Wokwi
+
+Este projeto está configurado para rodar nativamente no simulador **Wokwi** via VS Code, permitindo testar o código e a interface sem precisar do hardware físico.
+
+### ⚠️ Atenção ao Editar a Interface
+O design das telas é gerado pela ferramenta **GUIslice Builder**. Os arquivos `.ino` e `.h` (cabeçalho) contêm áreas geradas automaticamente pelo software e áreas onde reside a sua lógica customizada.
+
+* O arquivo **`src/Baja_GSLC.h`** (e partes do `.ino`) é atualizado automaticamente pelo Builder quando você salva mudanças no layout.
+* **Cuidado:** Ao regenerar o código pelo GUIslice Builder, certifique-se de **não sobrescrever** as funções lógicas manuais (como cálculos de sensores e `void loop`). O código está estruturado com tags como `//<App !Start!>` para guiar onde é seguro editar.
+
+> **Dica:** O arquivo de projeto do GUIslice (`.prj`) está incluído na pasta `src`. Você pode abri-lo no GUIslice Builder para modificar cores e posições dos botões, e depois salvar para atualizar o código automaticamente.
+
 ## 🛠️ Hardware Necessário
+
+<div align="center">
 
 | Componente | Quantidade | Descrição |
 | :--- | :---: | :--- |
@@ -45,6 +61,8 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
 | **Sensores Capacitivos**| 2 | Para nível de combustível |
 | **Placa de Filtro** | 1 | Condicionamento de sinal (12V -> 3.3V) |
 | **Ímãs de Neodímio** | 10 | Fixados na roda para leitura de velocidade |
+
+</div>
 
 > ⚠️ **Nota Técnica:** Neste projeto, utilizamos uma placa de filtro customizada (veja o esquemático abaixo). O Pull-up para o sensor DS18B20 já está acoplado internamente no chicote.
 >
@@ -60,6 +78,9 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
 ## 📍 Pinout Detalhado
 
 ### 🖥️ Display TFT (SPI)
+
+<div align="center">
+
 | Pino Display | Pino ESP32 | Notas |
 | :--- | :--- | :--- |
 | **VCC** | 3.3V | Alimentação |
@@ -71,7 +92,12 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
 | **SCK** | GPIO 18 | Clock SPI |
 | **LED** | 3.3V | Backlight |
 
+</div>
+
 ### ⚙️ Sensores
+
+<div align="center">
+
 | Sensor | Pino ESP32 | Detalhes |
 | :--- | :--- | :--- |
 | **Temperatura (DS18B20)** | **GPIO 32** | Dados (Pull-up via hardware) |
@@ -79,22 +105,34 @@ O sistema consiste em um painel de instrumentos digital completo utilizando **ES
 | **Combustível (Nível 1)** | **GPIO 34** | Entrada Digital (Sensor Capacitivo) |
 | **Combustível (Nível 2)** | **GPIO 35** | Entrada Digital (Sensor Capacitivo) |
 
+</div>
+
 > ⚠️ **Atenção:** Os pinos **34 e 35** são *Input Only* e não possuem pull-up interno. A nossa **Placa de Filtro** realiza o tratamento elétrico necessário (optoacoplador/divisor), garantindo a leitura correta.
 
-## 🚀 Como Instalar e Compilar
+## 🚀 Instalação (Plug & Play)
 
-Este repositório já contém todas as dependências necessárias na pasta `lib`. **Você não precisa baixar bibliotecas manualmente.**
+Este projeto foi configurado para ser **"Baixar e Usar"**.
+Todas as bibliotecas necessárias já estão inclusas dentro da pasta `lib`. **Você não precisa instalar nada manualmente.**
 
-### Opção 1: Usando VS Code + PlatformIO (Recomendado)
-1. Clone ou baixe este repositório.
-2. Abra a pasta do projeto no **VS Code**.
-3. O PlatformIO reconhecerá automaticamente a estrutura e as bibliotecas locais (`GUIslice`, `DallasTemperature`, `OneWire`, `TFT_eSPI`).
-4. Clique em **Upload** para gravar no ESP32.
+### ⚡ Passo a Passo Rápido
 
-### Opção 2: Usando Arduino IDE
-1. Baixe o projeto.
-2. Abra o arquivo principal.
-3. Copie as pastas de `lib` para a pasta `libraries` do seu Arduino caso tenha problemas de compilação.
+1. **Baixe o Código:**
+   - Clique em `<> Code` no topo desta página e selecione **"Download ZIP"**.
+   - Extraia a pasta no seu computador.
+
+2. **Abra e Grave:**
+
+   #### 🟢 Via VS Code (Recomendado)
+   - Certifique-se de ter as extensões **Wokwi Simulator** e **PlatformIO** instaladas.
+   - Abra a pasta extraída no VS Code.
+   - O **PlatformIO** vai configurar tudo sozinho.
+   - Clique no **Check (✔)** para compilar e abra o arquivo `.json` para iniciar o simulador.
+
+   #### 🔵 Via Arduino IDE
+   - Abra o arquivo `src/Baja.ino`.
+   - Copie as pastas de dentro de `lib` para a sua pasta de bibliotecas do Arduino (geralmente em `Documentos/Arduino/libraries`).
+   - Instale o suporte à placa **ESP32** no gerenciador de placas.
+   - Selecione a porta e clique em **Carregar**.
 
 ## ⚙️ Configuração da Roda
 
